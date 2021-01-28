@@ -2,13 +2,13 @@ import React from "react";
 import {
   HashRouter as Router,
   Switch,
-  Route,
-  Link
+  Route
 } from "react-router-dom";
 import Home from "./pages/home";
 import About from "./pages/about";
 import Users from "./pages/users";
-import { NavLink, Nav, Navbar } from "react-bootstrap";
+import { Nav, Navbar } from "react-bootstrap";
+import { NavLink } from "./elements/navlink";
 
 export default function App() {
 
@@ -20,13 +20,13 @@ export default function App() {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="mr-auto">
-                <NavLink as={Link} to="/">Home</NavLink>
-                <NavLink as={Link} to="/about">About</NavLink>
-                <NavLink as={Link} to="/users">Users</NavLink>
+                <NavLink to="/">Home</NavLink>
+                <NavLink to="/about">About</NavLink>
+                <NavLink to="/users">Users</NavLink>
               </Nav>
             </Navbar.Collapse>
         </Navbar>
-
+    
         {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
         <Switch>
