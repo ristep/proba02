@@ -1,13 +1,11 @@
 import React from "react";
-import { Button } from "react-bootstrap";
+import { BtnLink } from "../elements/btnlink";
 
-const About = () => {
+export const About = () => {
   return( 
   <>
     <h2>About page</h2>
-    <Button>Test</Button>
+    <BtnLink to="/home">Home</BtnLink>
   </>  
   ); 
 }
-
-export default About;

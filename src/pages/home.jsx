@@ -1,7 +1,11 @@
 import React from "react";
+import { BtnLink } from "../elements/btnlink";
 
-const Home = () => {
-  return <h2>Домашна страна</h2>;
+export const Home = () => {
+  return( 
+    <>
+      <h2>Home page</h2>
+      <BtnLink to="/apod">APOD</BtnLink>
+    </>  
+    ); 
 }
-
-export default Home;
