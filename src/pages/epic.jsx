@@ -10,7 +10,7 @@ export const Epic = () => {
   const [year, setYear] = useState('2021');
   const [month, setMonth] = useState('02');
   const [day, setDay] = useState('05');
-  const [photoData, setPhotoData] = useState({});
+  const [photoData, setPhotoData] = useState([]);
 
   useEffect(() => {
     setFiltList(epicDayList.filter(ym => ym.startsWith(year + '-' + month + '-')));
@@ -24,7 +24,7 @@ export const Epic = () => {
   }, []);
 
   useEffect(() => {
-    setPhotoData({});
+    setPhotoData([]);
     axios.get('https://api.nasa.gov/EPIC/api/natural/date/'+year+'-'+month+'-'+day+'?api_key=14kQ7Rt7juZFOot4zYe0Tacjt0Z7s66H3MjEbdRU').then( res => {
         setPhotoData(res.data);
     });
@@ -70,9 +70,14 @@ export const Epic = () => {
           {dd}
         </Button>
       ))}
-      <ReactJson src={photoData} />
+      <hr />
+      { photoData.map( (pd, key) => (
+        <img src={'https://epic.gsfc.nasa.gov/archive/natural/'+year+'/'+month+'/'+day+'/thumbs/epic_1b_'+pd.identifier+'.jpg'} />
+      ))} 
+
+      {/* <ReactJson src={photoData} /> */}
 
     </div>
   );
 }
-//https://epic.gsfc.nasa.gov/archive/natural/2021/01/14/png/epic_1b_20210114124446.png
+//https://epic.gsfc.nasa.gov/archive/natural/2021/01/14/thumbs/epic_1b_{identifier}.png
