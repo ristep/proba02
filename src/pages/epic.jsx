@@ -3,7 +3,6 @@ import axios from 'axios';
 
 import { Button, ButtonGroup, Col, Container, Dropdown, DropdownButton, Image, Row } from "react-bootstrap";
 import ReactJson from "react-json-view";
-import { Link } from "react-router-dom";
 
 export const Epic = () => {
   const [epicDayList, setEpicDayList] = useState([]);
@@ -11,12 +10,10 @@ export const Epic = () => {
   const [year, setYear] = useState('2021');
   const [month, setMonth] = useState('02');
   const [day, setDay] = useState('04');
-  const [photoData, setPhotoData] = useState([]);
+  const [photoList, setPhotoList] = useState([]);
   const [photoUrl, setPhotoUrl] = useState('');
-
-  useEffect(() => {
-    setFiltList(epicDayList.filter(ym => ym.startsWith(year + '-' + month + '-')));
-  }, [year, month, epicDayList]);
+  const [hdPhotoUrl, setHdPhotoUrl] = useState('');
+  const [photoData, setPhotoData] = useState({});
 
   useEffect(() => {
     axios.get(`https://api.nasa.gov/EPIC/api/natural/available?api_key=14kQ7Rt7juZFOot4zYe0Tacjt0Z7s66H3MjEbdRU`)
@@ -26,20 +23,33 @@ export const Epic = () => {
   }, []);
 
   useEffect(() => {
-    setPhotoData([]);
+    setFiltList(epicDayList.filter(ym => ym.startsWith(year + '-' + month + '-')));
+  }, [year, month, epicDayList]);
+
+  useEffect(() => {
+    setPhotoList([]);
     setPhotoUrl('');
     axios.get('https://api.nasa.gov/EPIC/api/natural/date/' + year + '-' + month + '-' + day + '?api_key=14kQ7Rt7juZFOot4zYe0Tacjt0Z7s66H3MjEbdRU').then(res => {
-        setPhotoData(res.data);
-        if(res.data){
-          setPhotoUrl('https://epic.gsfc.nasa.gov/archive/natural/' + year + '/' + month + '/' + day + '/jpg/epic_1b_' + res.data[0].identifier + '.jpg');
+        setPhotoList(res.data);
+        if(res.data.length>0){
+          setPhotoUrl  ('https://epic.gsfc.nasa.gov/archive/natural/' + year + '/' + month + '/' + day + '/jpg/epic_1b_' + res.data[0].identifier + '.jpg');
         }
     });
   }, [year, month, day]);
 
-  const thumbClick = (id) => {
-    setPhotoUrl('https://epic.gsfc.nasa.gov/archive/natural/' + year + '/' + month + '/' + day + '/jpg/epic_1b_' + id + '.jpg');
+  const thumbClick = (pd) => {
+    setPhotoData(pd);
+    setPhotoUrl('https://epic.gsfc.nasa.gov/archive/natural/' + year + '/' + month + '/' + day + '/jpg/epic_1b_' + pd.identifier + '.jpg');
+    setHdPhotoUrl('https://epic.gsfc.nasa.gov/archive/natural/' + year + '/' + month + '/' + day + '/png/epic_1b_' + pd.identifier + '.png');
   };
 
+  const photoClick = () => {
+    const win = window.open(hdPhotoUrl, '_blank');
+    if (win != null) {
+      win.focus();
+    }
+  }
+  
   return (
     <div>
       <Container style={{ padding: '1em' }}>
@@ -84,8 +94,8 @@ export const Epic = () => {
         </Row>
         <Row style={{ paddingTop: '1em' }}>
           <Col>
-          {photoData.map((pd, key) => (
-            <Button variant="light" style={{ padding: '0.4em' }} onClick={() => thumbClick(pd.identifier)}>
+          {photoList.map((pd, key) => (
+            <Button variant="light" style={{ padding: '0.4em' }} onClick={() => thumbClick(pd)} id={key}>
               <Image src={'https://epic.gsfc.nasa.gov/archive/natural/' + year + '/' + month + '/' + day + '/thumbs/epic_1b_' + pd.identifier + '.jpg'} style={{ maxWidth: '60px' }} rounded />
             </Button>
           ))}
@@ -93,14 +103,14 @@ export const Epic = () => {
         </Row>
         <Row style={{ paddingTop: '1em' }}>
           <Col>
-            <Button variant="light" style={{ padding: '0.4em' }}>
+            <Button onClick={() => photoClick()} variant="light" style={{ padding: '0.4em' }}>
               <img src={photoUrl} />
             </Button>
           </Col>
         </Row>
       </Container>
 
-      {/* <ReactJson src={photoData} /> */}
+      <ReactJson src={photoData} />
 
     </div>
   );
