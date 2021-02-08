@@ -1,25 +1,35 @@
 import React, { useEffect, useState } from "react";
 import axios from 'axios';
+import moment from "moment";
 
 import { Button, ButtonGroup, Col, Container, Dropdown, DropdownButton, Image, Row } from "react-bootstrap";
-import ReactJson from "react-json-view";
+import { useHistory, useParams } from "react-router-dom";
 
 export const Epic = () => {
+  const { year = moment().format('YYYY'), month = moment().format('MM'), day=moment().format('DD'), ndx=0 } = useParams();
+  
   const [epicDayList, setEpicDayList] = useState([]);
   const [filtList, setFiltList] = useState([]);
-  const [year, setYear] = useState('2021');
-  const [month, setMonth] = useState('02');
-  const [day, setDay] = useState('04');
   const [photoList, setPhotoList] = useState([]);
-  const [photoUrl, setPhotoUrl] = useState('');
-  const [hdPhotoUrl, setHdPhotoUrl] = useState('');
-  const [photoData, setPhotoData] = useState({});
+  
+  const history = useHistory();
+
+  const historyPush = (yy, mm, dd, ii) => {
+    history.push("/epic/" + yy + "/" + mm + "/" + dd + '/' + ii);
+  };
+
+  const photoUri = (type,ndx) => {
+    const ext = type==='png' ? '.png' : '.jpg'; 
+    if(photoList[ndx]) 
+      return 'https://epic.gsfc.nasa.gov/archive/natural/' + year + '/' + month + '/' + day + '/'+type+'/epic_1b_' + photoList[ndx].identifier + ext;
+    return '';  
+  };
 
   useEffect(() => {
     axios.get(`https://api.nasa.gov/EPIC/api/natural/available?api_key=14kQ7Rt7juZFOot4zYe0Tacjt0Z7s66H3MjEbdRU`)
       .then(res => {
         setEpicDayList(res.data);
-      })
+      }); 
   }, []);
 
   useEffect(() => {
@@ -27,31 +37,15 @@ export const Epic = () => {
   }, [year, month, epicDayList]);
 
   useEffect(() => {
-    setPhotoList([]);
-    setPhotoUrl('');
-    axios.get('https://api.nasa.gov/EPIC/api/natural/date/' + year + '-' + month + '-' + day + '?api_key=14kQ7Rt7juZFOot4zYe0Tacjt0Z7s66H3MjEbdRU').then(res => {
+    axios.get('https://api.nasa.gov/EPIC/api/natural/date/' + year + '-' + month + '-' + day + '?api_key=14kQ7Rt7juZFOot4zYe0Tacjt0Z7s66H3MjEbdRU')
+      .then(res => {
         setPhotoList(res.data);
-        if(res.data.length>0){
-          setPhotoUrl  ('https://epic.gsfc.nasa.gov/archive/natural/' + year + '/' + month + '/' + day + '/jpg/epic_1b_' + res.data[0].identifier + '.jpg');
-        }
-    });
+      });
   }, [year, month, day]);
 
-  const thumbClick = (pd) => {
-    setPhotoData(pd);
-    setPhotoUrl('https://epic.gsfc.nasa.gov/archive/natural/' + year + '/' + month + '/' + day + '/jpg/epic_1b_' + pd.identifier + '.jpg');
-    setHdPhotoUrl('https://epic.gsfc.nasa.gov/archive/natural/' + year + '/' + month + '/' + day + '/png/epic_1b_' + pd.identifier + '.png');
-  };
-
-  const photoClick = () => {
-    const win = window.open(hdPhotoUrl, '_blank');
-    if (win != null) {
-      win.focus();
-    }
-  }
-  
   return (
     <div>
+
       <Container style={{ padding: '1em' }}>
         <Row>
           <Col>
@@ -59,7 +53,7 @@ export const Epic = () => {
           </Col>
           <Col>
             <ButtonGroup>
-              <DropdownButton onSelect={(yy) => setYear(yy)} as={ButtonGroup} title={"Year - " + year} id="bg-nested-dropdown">
+              <DropdownButton onSelect={(yy) => historyPush(yy,month,day, ndx)} as={ButtonGroup} title={"Year - " + year} id="bg-nested-dropdown">
                 <Dropdown.Item eventKey="2015">2015</Dropdown.Item>
                 <Dropdown.Item eventKey="2016">2016</Dropdown.Item>
                 <Dropdown.Item eventKey="2017">2017</Dropdown.Item>
@@ -68,7 +62,7 @@ export const Epic = () => {
                 <Dropdown.Item eventKey="2020">2020</Dropdown.Item>
                 <Dropdown.Item eventKey="2021">2021</Dropdown.Item>
               </DropdownButton>
-              <DropdownButton onSelect={(mm) => setMonth(mm)} as={ButtonGroup} title={"month - " + month} id="bg-nested-dropdown">
+              <DropdownButton onSelect={(mm) => historyPush(year, mm, day, ndx)} as={ButtonGroup} title={"month - " + month} id="bg-nested-dropdown">
                 <Dropdown.Item eventKey="01">January</Dropdown.Item>
                 <Dropdown.Item eventKey="02">February</Dropdown.Item>
                 <Dropdown.Item eventKey="03">March</Dropdown.Item>
@@ -82,7 +76,7 @@ export const Epic = () => {
                 <Dropdown.Item eventKey="11">November</Dropdown.Item>
                 <Dropdown.Item eventKey="12">December</Dropdown.Item>
               </DropdownButton>
-              <DropdownButton onSelect={(dd) => setDay(dd)} as={ButtonGroup} title={"day - " + day} id="bg-nested-dropdown">
+              <DropdownButton onSelect={(dd) => historyPush(year,month,dd,ndx)} as={ButtonGroup} title={"day - " + day} id="bg-nested-dropdown">
                 {filtList.map((dd, key) => (
                   <Dropdown.Item id={key} eventKey={dd.substr(dd.length - 2)} >
                     {dd}
@@ -95,29 +89,22 @@ export const Epic = () => {
         <Row style={{ paddingTop: '1em' }}>
           <Col>
           {photoList.map((pd, key) => (
-            <Button variant="light" style={{ padding: '0.4em' }} onClick={() => thumbClick(pd)} id={key}>
-              <Image src={'https://epic.gsfc.nasa.gov/archive/natural/' + year + '/' + month + '/' + day + '/thumbs/epic_1b_' + pd.identifier + '.jpg'} style={{ maxWidth: '60px' }} rounded />
+            <Button variant={ key!=ndx ? 'light' : 'primary'} style={{ padding: '0.4em' }} onClick={() => historyPush(year,month,day,key)} id={key}>
+              <Image src={photoUri('thumbs',key)} style={{ maxWidth: '60px' }} rounded />
+              {/* <Image src={'https://epic.gsfc.nasa.gov/archive/natural/' + year + '/' + month + '/' + day + '/thumbs/epic_1b_' + pd.identifier + '.jpg'} style={{ maxWidth: '60px' }} rounded /> */}
             </Button>
           ))}
         </Col>
         </Row>
         <Row style={{ paddingTop: '1em' }}>
           <Col>
-            <Button onClick={() => photoClick()} variant="light" style={{ padding: '0.4em' }}>
-              <img src={photoUrl} />
+            <Button onClick={() => window.open(photoUri('png',ndx), '_blank')} variant="light" style={{ padding: '0.4em' }}>
+              <img src={photoUri('jpg',ndx)} alt='Photo...' />
             </Button>
           </Col>
         </Row>
-      </Container>
-
-      <ReactJson src={photoData} />
+      </Container> 
 
     </div>
   );
 }
-//https://epic.gsfc.nasa.gov/archive/natural/2021/01/14/thumbs/epic_1b_{identifier}.png
-// {filtList.map((dd, key) => (
-//   <Button id={key} onClick={() => setDay(dd.substr(dd.length - 2))} size="sm">
-//     {dd}
-//   </Button>
-// ))}
