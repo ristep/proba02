@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import ReactJson from "react-json-view";
 import { Card, Container } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import moment from "moment";
@@ -8,7 +7,6 @@ import moment from "moment";
 export const Apod = () => {
   const { year = moment().format('YYYY'), month = moment().format('MM'), day=moment().format('DD') } = useParams();
   const [apod, setApod] = useState({});
-  const [apodList, setApodList] = useState({});
 
   useEffect(() => {
     axios
