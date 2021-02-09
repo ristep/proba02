@@ -13,7 +13,6 @@ export const Epic = () => {
   const [photoList, setPhotoList] = useState([]);
   
   const history = useHistory();
-
   const historyPush = (yy, mm, dd, ii) => {
     history.push("/epic/" + yy + "/" + mm + "/" + dd + '/' + ii);
   };
@@ -89,7 +88,7 @@ export const Epic = () => {
         <Row style={{ paddingTop: '1em' }}>
           <Col>
           {photoList.map((pd, key) => (
-            <Button variant={ key!=ndx ? 'light' : 'primary'} style={{ padding: '0.4em' }} onClick={() => historyPush(year,month,day,key)} id={key}>
+            <Button variant={ key!==ndx ? 'light' : 'primary'} style={{ padding: '0.4em' }} onClick={() => historyPush(year,month,day,key)} id={key}>
               <Image src={photoUri('thumbs',key)} style={{ maxWidth: '60px' }} rounded />
               {/* <Image src={'https://epic.gsfc.nasa.gov/archive/natural/' + year + '/' + month + '/' + day + '/thumbs/epic_1b_' + pd.identifier + '.jpg'} style={{ maxWidth: '60px' }} rounded /> */}
             </Button>

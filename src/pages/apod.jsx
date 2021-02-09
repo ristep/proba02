@@ -1,12 +1,23 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Card, Container } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import moment from "moment";
+import DayPicker from 'react-day-picker';
+import 'react-day-picker/lib/style.css';
 
 export const Apod = () => {
   const { year = moment().format('YYYY'), month = moment().format('MM'), day=moment().format('DD') } = useParams();
   const [apod, setApod] = useState({});
+  const [selectedDay, setSelectedDay ] = useState(moment(year+'-'+month+'-'+day).toDate());
+
+  const history = useHistory();
+
+  const handleDayClick = (dd) => {
+    const date = moment(dd);
+    history.push("/apod/" + date.format('YYYY') + "/" + date.format('MM') + "/" + date.format('DD') );
+    setSelectedDay(date.toDate());
+  };
 
   useEffect(() => {
     axios
@@ -15,13 +26,17 @@ export const Apod = () => {
       )
       .then((res) => {
         setApod(res.data);
-        // setHeaders(res);
       });
   }, [year,month,day]);
 
   return (
     <Container>
       <h2>Astronomy Photo of the Day {apod.date}</h2>
+      
+      <DayPicker
+          selectedDays={selectedDay}
+          onDayClick={(dd) => handleDayClick(dd)}
+      />
 
       <Card className="bg-dark text-white">
         <Card.Img src={apod.url} alt="Card image" />
