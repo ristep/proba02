@@ -1,5 +1,5 @@
-// testing A2 switch and A3
-// voa e od A3
+
+//Leprakon 
 import React from "react";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import { Nav, Navbar } from "react-bootstrap";
@@ -27,7 +27,7 @@ export default function App() {
             </Nav>
           </Navbar.Collapse>
         </Navbar>
-{/* //a4 glp */}
+
         <Switch>
           <Route path="/about">
             <About />
